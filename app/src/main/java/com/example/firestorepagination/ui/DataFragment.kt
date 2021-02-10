@@ -5,10 +5,12 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.paging.LoadState
 import com.example.firestorepagination.R
 import com.example.firestorepagination.databinding.FragmentDataBinding
 import com.example.firestorepagination.model.UserMessages
@@ -16,6 +18,7 @@ import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 
@@ -81,17 +84,17 @@ class DataFragment : Fragment() {
 
         lifecycleScope.launch {
             viewModel.incomingData.collect {
-                //adapter.submitData(it)
-                binding.dataList.text = it.toString()
+                adapter.submitData(it)
+
             }
         }
 
-//        lifecycleScope.launch {
-//            adapter.loadStateFlow.collectLatest { loadStates ->
-//                binding.progressBar.isVisible = loadStates.refresh is LoadState.Loading
-//                binding.progressBarLoadMore.isVisible = loadStates.append is LoadState.Loading
-//            }
-//        }
+        lifecycleScope.launch {
+            adapter.loadStateFlow.collectLatest { loadStates ->
+                binding.progressBar.isVisible = loadStates.refresh is LoadState.Loading
+                binding.progressBarLoadMore.isVisible = loadStates.append is LoadState.Loading
+            }
+        }
 
 
         return binding.root
