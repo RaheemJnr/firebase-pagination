@@ -13,7 +13,7 @@ class DataViewModel : ViewModel() {
 
 
     val incomingData = Pager(
-        PagingConfig(1)
+        PagingConfig(20)
     ) {
         FirestorePagingSource(Firebase.firestore)
     }.flow.cachedIn(viewModelScope)

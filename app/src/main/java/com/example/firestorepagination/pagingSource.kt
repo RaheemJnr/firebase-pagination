@@ -16,9 +16,13 @@ class FirestorePagingSource(
 
     override suspend fun load(params: LoadParams<QuerySnapshot>): LoadResult<QuerySnapshot, UserMessages> {
         return try {
-            val currentPage = params.key ?: db.collection("message").get().await()
+            val currentPage = params.key ?: db.collection("message").limit(10).get().await()
             val lastVisibleProduct = currentPage.documents[currentPage.size() - 1]
-            val nextPage = db.collection("message").startAfter(lastVisibleProduct).get().await()
+            val nextPage =
+                db.collection("message").startAfter(lastVisibleProduct).limit(10)
+                    .get()
+                    .await()
+
             LoadResult.Page(
                 data = currentPage.toObjects(UserMessages::class.java),
                 prevKey = null,
