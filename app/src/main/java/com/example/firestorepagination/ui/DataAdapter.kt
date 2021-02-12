@@ -9,47 +9,40 @@ import com.example.firestorepagination.databinding.ListItemBinding
 import com.example.firestorepagination.model.UserMessages
 
 class DataAdapter :
-    PagingDataAdapter<UserMessages, DataAdapter.ViewHolder>(DiffCallback) {
+    PagingDataAdapter<UserMessages, DataAdapter.UserViewHolder>(Companion) {
 
-    // viewHolder
-    class ViewHolder(private var binding: ListItemBinding) :
-        RecyclerView.ViewHolder(binding.root) {
-        fun bind(users: UserMessages) {
-            binding.user = users
-            binding.executePendingBindings()
-        }
-
-        // inflate layout from viewHolder
-        companion object {
-            fun from(parent: ViewGroup): ViewHolder {
-                val layoutInflater = LayoutInflater.from(parent.context)
-                val binding = ListItemBinding.inflate(
-                    layoutInflater, parent, false,
-                )
-                return ViewHolder(binding)
-            }
+    inner class UserViewHolder(
+        private val dataBinding: ListItemBinding
+    ) : RecyclerView.ViewHolder(dataBinding.root) {
+        fun bindProduct(user: UserMessages) {
+            dataBinding.user = user
         }
     }
 
-    // layout inflater
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        return ViewHolder.from(parent)
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): UserViewHolder {
+        val layoutInflater = LayoutInflater.from(parent.context)
+        val dataBinding = ListItemBinding.inflate(
+            layoutInflater,
+            parent,
+            false
+        )
+        return UserViewHolder(dataBinding)
     }
 
     // view Binder
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.bind(getItem(position)!!)
+    override fun onBindViewHolder(holder: UserViewHolder, position: Int) {
+        val product = getItem(position) ?: return
+        holder.bindProduct(product)
+    }
+
+    companion object : DiffUtil.ItemCallback<UserMessages>() {
+        override fun areItemsTheSame(oldItem: UserMessages, newItem: UserMessages): Boolean {
+            return oldItem.id == newItem.id
+        }
+
+        override fun areContentsTheSame(oldItem: UserMessages, newItem: UserMessages): Boolean {
+            return oldItem == newItem
+        }
     }
 }
 
-// callback to compare content and item
-object DiffCallback : DiffUtil.ItemCallback<UserMessages>() {
-    override fun areItemsTheSame(oldItem: UserMessages, newItem: UserMessages): Boolean {
-        return oldItem === newItem
-    }
-
-    override fun areContentsTheSame(oldItem: UserMessages, newItem: UserMessages): Boolean {
-        return oldItem.timestamp == newItem.timestamp
-    }
-
-}

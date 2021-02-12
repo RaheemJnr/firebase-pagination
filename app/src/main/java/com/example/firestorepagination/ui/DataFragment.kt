@@ -44,47 +44,25 @@ class DataFragment : Fragment() {
         //init fireStore
         val db = Firebase.firestore
 
-        val messagge = UserMessages(
+        val message = UserMessages(
             "Hi, What's up", System.currentTimeMillis(),
             "https://picsum.photos/200",
             "User", 2L, 7L, "Jnr", "message"
         )
 
         //insert data
-        val message = db.collection("message").document("user")
-
-        //send inserted data to fire store
-
-        db.runBatch { batch ->
-            // Set the value of 'NYC'
-            batch.set(
-                message, messagge
-            )
-            batch.set(
-                message, messagge
-            )
-            batch.set(
-                message, messagge
-            )
-            batch.set(
-                message, messagge
-            )
-            batch.set(
-                message, messagge
-            )
-        }.addOnCompleteListener {
-            Log.d(
-                "Fire",
-                "DocumentSnapshot written with ID: ${"done"}"
-            )
+        for (i in 0..5) {
+            db.collection("message").document().set(message)
         }
 
+
         //
-        //binding.dataList.adapter = adapter
+        binding.dataList.adapter = adapter
 
         lifecycleScope.launch {
-            viewModel.incomingData.collect {
+            viewModel.incomingData.collectLatest {
                 adapter.submitData(it)
+                //binding.dataList.text = it
 
             }
         }

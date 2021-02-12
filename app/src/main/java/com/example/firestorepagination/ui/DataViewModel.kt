@@ -11,7 +11,10 @@ import com.google.firebase.ktx.Firebase
 
 class DataViewModel : ViewModel() {
 
-    val incomingData = Pager(PagingConfig(1)) {
+
+    val incomingData = Pager(
+        PagingConfig(1)
+    ) {
         FirestorePagingSource(Firebase.firestore)
     }.flow.cachedIn(viewModelScope)
 
